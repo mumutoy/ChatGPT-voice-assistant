@@ -1,0 +1,24 @@
+[
+    {
+        "time": "26 12 * * *",
+        "type": "url",
+        "data": "https://xxx.com/a.txt"
+    },
+    {
+        "time": "18 13 * * *",
+        "type": "text",
+        "data": "现在10点15分了，记得去上班哟。"
+    },
+    {
+        "time": "19 13 * * *",
+        "type": "music",
+        "data": [
+            "ok.mp3"
+        ]
+    },
+    {
+        "time": "2 22 2 7 *",
+        "type": "text",
+        "data": "五分钟后提醒"
+    }
+]

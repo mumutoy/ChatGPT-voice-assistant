@@ -56,7 +56,7 @@ ChatGPT语音助手，支持自定义命令，定时任务（支持播放文字�
   CORRECT_PROMPT = "你是一位文章改错能手，能够帮人改正文字中可能存在的一些错误文字，可能里面有地名或者其他内容的错误，请帮我修正他们，其他内容则不需要做任何修改（包括标点符号），并直接返回修正之后的内容，不要回答多余的内容。"
   # whisper 模型
   WHISPER_MODEL = "large-v3" 
-  # edge-tts发声人，获取发声人列表，可输入: `edge-tts -l`
+  # edge-tts发声人，获取发声人列表，可输入: `edge-tts --list-voices`
   EDGETTS_VOICE = "zh-CN-XiaoyiNeural"
   
   # 5秒内即将执行的任务，对话当中，如果定时任务还有指定时间，自动退出当前对话，优先执行定时任务

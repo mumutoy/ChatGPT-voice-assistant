@@ -436,12 +436,16 @@ def speech_to_text():
         # 过滤掉不需要的词汇
         patterns = [re.compile(word) for word in FILTER_WORDS]
         for pattern in patterns:
-            text = pattern.sub('', text)
+            # text = pattern.sub('', text)
+            # 修改满足条件的内容，自动删除掉，避免whisper识别错误内容
+            if pattern.search(text):
+                print("满足过滤条件，过滤所有内容", pattern, text)
+                return ['', audio_file]
 
         print(f"你说: {text}")
     
         # 延时 500 毫秒
-        time.sleep(0.5)
+        # time.sleep(0.5)
 
         return [text, audio_file]
 

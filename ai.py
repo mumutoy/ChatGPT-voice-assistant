@@ -571,7 +571,7 @@ while True:
     # 保存日志
     save_log("识别语音：" + text)
 
-    # 修正语音识别错误
+    # 修正语音识别错误，如果开启了GPT修正错别字功能
     text = correct_text(text)
 
     # 将文本转换为拼音
@@ -588,12 +588,12 @@ while True:
             print("检测到特殊关键词！",matched_text)
             response = response.get("response", "无法获取响应")
             # 保存特殊关键词回复
-            save_log("特殊关键词回复：" + text)
+            save_log("特殊关键词回复：" + response)
             matched = True
             break
 
     if matched:
-        print(response)
+        # print(response)
         if response != '':
             with tempfile.NamedTemporaryFile(suffix='.mp3', prefix='tts_', delete=False) as temp_file:
                 temp_filename = temp_file.name
@@ -614,6 +614,7 @@ while True:
         # 检查是否有即将执行的定时任务
         upcoming_tasks = check_upcoming_tasks()
         if upcoming_tasks:
+            print("定时任务出现，先退对话模式")
             for task in upcoming_tasks:
                 if task["type"] == "url":
                     execute_url_task(task)
@@ -645,8 +646,7 @@ while True:
                     filename = "temp/default_response.mp3"
                     if os.path.isfile(filename) == False:
                         filename = text_to_speech(response, "temp/default_response.mp3")
-                        # 将文件改名 default_response.mp3
-                        # os.rename(filename, "temp/default_response.mp3")
+
                     play_audio("temp/default_response.mp3")
                 else:
                     with tempfile.NamedTemporaryFile(suffix='.mp3', prefix='tts_', delete=False) as temp_file:
@@ -664,22 +664,21 @@ while True:
                 response = ""
 
             # 监听用户的响应
-            speech_result = speech_to_text()  # 使用新的变量名来存储返回值
-            user_input = speech_result[0]
-            temp_file = speech_result[1]
-            print("解析音频", user_input, os.path.basename(temp_file))
-            if os.path.isfile(temp_file):
-                os.remove(temp_file)
+            speech_result_chat = speech_to_text()  # 使用新的变量名来存储返回值
+            user_input_chat = speech_result_chat[0]
+            temp_file_chat = speech_result_chat[1]
+            print("解析音频", user_input_chat, os.path.basename(temp_file_chat))
+            if os.path.isfile(temp_file_chat):
+                os.remove(temp_file_chat)
 
-            if user_input is None or user_input.strip() == "":
+            if user_input_chat is None or user_input_chat.strip() == "":
                 blank_input_count += 1
                 if blank_input_count >= N:
                     print("未检测到输入。结束对话。")
-                    filename = "temp/default_timeout.mp3"
-                    if os.path.isfile(filename) == False:
-                        filename = text_to_speech("您已长时间未向我提问，我就先退出了。", "temp/default_timeout.mp3")
-                        # 将文件改名 default_response.mp3
-                        # os.rename(filename, "temp/default_response.mp3")
+                    filename_chat = "temp/default_timeout.mp3"
+                    if os.path.isfile(filename_chat) == False:
+                        filename_chat = text_to_speech("您已长时间未向我提问，我就先退出了。", "temp/default_timeout.mp3")
+
                     play_audio("temp/default_timeout.mp3")
                     end = True
                     break
@@ -687,44 +686,43 @@ while True:
 
             blank_input_count = 0  # 如果有有效输入，重置空白输入计数
 
-            user_input = user_input.lower()
+            user_input_chat = user_input_chat.lower()
 
             # 过滤掉标点符号
-            # user_input = re.sub(r'[^\w\s]', '', user_input)
+            user_input_chat = re.sub(r'[^\w\s]', '', user_input_chat)
 
             # 保存日志
-            save_log("用户语音识别内容："+user_input)
+            save_log("用户语音识别内容："+user_input_chat)
 
-            # 修正语音识别错误，gpt生成的不需要修正
-            # user_input = correct_text(user_input)
+            # 修正语音识别错误
+            user_input_chat = correct_text(user_input_chat)
 
             # 如果用户说“stop”或“bye”，退出对话循环
-            if any(end_word in user_input for end_word in END_WORDS):
+            if any(end_word in user_input_chat for end_word in END_WORDS):
                 print("退出本轮对话，再见！")
                 filename = "temp/default_bye.mp3"
                 if os.path.isfile(filename) == False:
                     filename = text_to_speech("好的，再见！有需要请喊我。", "temp/default_bye.mp3")
-                    # 将文件改名 default_response.mp3
-                    # os.rename(filename, "temp/default_response.mp3")
+                                                                                 
                 play_audio("temp/default_bye.mp3")
 
                 end = True
                 break
 
-            if any(stop_word in user_input for stop_word in STOP_WORDS):
+            # 若是“再见”等关键词，关闭本轮对话
+            if any(stop_word in user_input_chat for stop_word in STOP_WORDS):
                 print("退出本轮对话，再见！")
                 filename = "temp/default_over.mp3"
                 if os.path.isfile(filename) == False:
                     filename = text_to_speech("好的，我退下了！", "temp/default_over.mp3")
-                    # 将文件改名 default_response.mp3
-                    # os.rename(filename, "temp/default_response.mp3")
+                
                 play_audio("temp/default_over.mp3")
                 stop_status = True
                 break
 
-            if user_input != "":
+            if user_input_chat != "":
                 # 将用户输入添加到消息列表
-                messages.append({"role": "user", "content": user_input})
+                messages.append({"role": "user", "content": user_input_chat})
 
                 # 使用ChatGPT生成响应
                 response = get_response(messages)

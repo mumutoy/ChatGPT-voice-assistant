@@ -1,0 +1,11 @@
+edge-tts
+pyaudio
+wave
+playsound
+requests
+apscheduler
+langdetect
+pypinyin
+faster-whisper
+openai
+funasr
